@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      max-width: 400px;
+      margin: auto;
+    }
+    li {
+      font-size: 20px;
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    button {
+      padding: 5px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background-color: #ff5555;
+      color: white;
+    }
+    #total-price {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 30px;
+    }
+    #back-button, #payment-button {
+      margin-top: 30px;
+      padding: 10px 25px;
+      font-size: 18px;
+      border-radius: 5px;
+      border: none;
+      background-color: #4285f4;
+      color: white;
+      cursor: pointer;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Your Cart</h1>
+
+  <ul id="cart-list"></ul>
+
+  <p id="total-price">Total: $0.00</p>
+
+  <button id="back-button" onclick="goBack()">Back to Store</button>
+  <button id="payment-button" onclick="goToPayment()">Proceed to Payment</button>
+
+  <script>
+    const prices = {
+      "Apple": 4.00,
+      "Banana": 3.00,
+      "Orange": 6.50
+    };
+
+    const itemOrder = ["Apple", "Banana", "Orange"];
+
+    function updateCart() {
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const counts = {};
+
+      cartItems.forEach(item => {
+        counts[item] = (counts[item] || 0) + 1;
+      });
+
+      const cartList = document.getElementById("cart-list");
+      cartList.innerHTML = "";
+
+      itemOrder.forEach(item => {
+        if (counts[item] && counts[item] > 0) {
+          const li = document.createElement("li");
+          li.textContent = `${item} (${counts[item]}) - $${(prices[item] * counts[item]).toFixed(2)}`;
+
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "Remove one";
+          removeBtn.onclick = () => {
+            removeOne(item);
+          };
+
+          li.appendChild(removeBtn);
+          cartList.appendChild(li);
+        }
+      });
+
+      updateTotal(counts);
+    }
+
+    function removeOne(item) {
+      let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const index = cartItems.indexOf(item);
+      if (index > -1) {
+        cartItems.splice(index, 1);
+        localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      }
+      updateCart();
+    }
+
+    function updateTotal(counts) {
+      let total = 0;
+      for (const item in counts) {
+        total += prices[item] * counts[item];
+      }
+      const totalElem = document.getElementById("total-price");
+      totalElem.textContent = `Total: $${total.toFixed(2)}`;
+    }
+
+    function goBack() {
+      window.location.href = "index.html"; // Change if your main page is named differently
+    }
+
+    function goToPayment() {
+      window.location.href = "payment.html"; // Assumes your payment page is payment.html
+    }
+
+    window.onload = updateCart;
+  </script>
+</body>
+</html>

