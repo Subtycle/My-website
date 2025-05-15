@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Store</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      text-align: center;
+      background-color: #e8f0fe;
+    }
+    button {
+      margin: 8px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background-color: #4285f4;
+      color: white;
+    }
+    .item {
+      margin: 15px;
+      font-size: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .status {
+      font-size: 20px;
+      color: green;
+      font-weight: bold;
+      min-width: 80px;
+    }
+    .checkmark {
+      display: inline-block;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Store</h1>
+
+  <div class="item" id="item-Apple">
+    <span>Apple - $4.00</span>
+    <button onclick="addToCart('Apple')">Add to Cart</button>
+    <span class="status" id="status-Apple"></span>
+  </div>
+
+  <div class="item" id="item-Banana">
+    <span>Banana - $3.00</span>
+    <button onclick="addToCart('Banana')">Add to Cart</button>
+    <span class="status" id="status-Banana"></span>
+  </div>
+
+  <div class="item" id="item-Orange">
+    <span>Orange - $6.50</span>
+    <button onclick="addToCart('Orange')">Add to Cart</button>
+    <span class="status" id="status-Orange"></span>
+  </div>
+
+  <br/>
+  <button onclick="goToCheckout()">Go to Checkout</button>
+
+  <script>
+    const prices = {
+      "Apple": 4.00,
+      "Banana": 3.00,
+      "Orange": 6.50
+    };
+
+    // Store timeout IDs so we can reset timers
+    const checkmarkTimers = {};
+
+    // Update the status (checkmark + count) for all items
+    function updateStatus() {
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const counts = {};
+
+      cartItems.forEach(item => {
+        counts[item] = (counts[item] || 0) + 1;
+      });
+
+      Object.keys(prices).forEach(item => {
+        const statusSpan = document.getElementById("status-" + item);
+        const count = counts[item] || 0;
+
+        // Show count always if > 0
+        let countText = count > 0 ? `(${count})` : "";
+
+        // Checkmark visible only if timer running
+        const hasTimer = checkmarkTimers[item] !== undefined;
+
+        // Compose innerHTML with checkmark if timer active
+        if (count > 0) {
+          statusSpan.innerHTML = (hasTimer ? '<span class="checkmark">✅</span>' : '') + countText;
+        } else {
+          statusSpan.innerHTML = "";
+        }
+      });
+    }
+
+    function addToCart(item) {
+      let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      cartItems.push(item);
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+      // Reset timer for checkmark visibility for this item
+      if (checkmarkTimers[item]) {
+        clearTimeout(checkmarkTimers[item]);
+      }
+
+      // Show checkmark immediately
+      checkmarkTimers[item] = setTimeout(() => {
+        // Remove timer entry and update status (hides checkmark)
+        delete checkmarkTimers[item];
+        updateStatus();
+      }, 5000);
+
+      updateStatus();
+    }
+
+    function goToCheckout() {
+      window.location.href = "checkout.html";
+    }
+
+    window.onload = () => {
+      updateStatus();
+    };
+  </script>
+</body>
+</html>
